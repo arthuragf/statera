@@ -1,0 +1,2 @@
+# statera
+Personal finances project
