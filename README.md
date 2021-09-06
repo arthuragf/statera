@@ -1,2 +1,4 @@
 # statera
-Personal finances project
+Personal finances project.
+
+This project is being developed in development branch.
