@@ -8,5 +8,6 @@ class Response {
 
     public function redirect(string $sUrl) {
         header('Location: ' . $sUrl);
+        exit;
     } 
 }

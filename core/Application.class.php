@@ -1,17 +1,18 @@
 <?php
 namespace statera\core;
 
-use statera\core\db\Database;
+use statera\core\db\ApplicationModel;
 
 class Application {
     const EVENT_BEFORE_REQUEST = 'beforeRequest';
     const EVENT_AFTER_REQUEST = 'afterRequest';
 
     public static string $ROOT_DIR;
+    public static string $COMMON_URL;
     public static Application $clsApp;
     public string $sUserClass;
     public string $sLayout = 'main';
-    public Database $clsDb;
+    public ApplicationModel $clsDb;
     public Router $clsRouter;
     public Request $clsRequest;
     public Response $clsResponse;
@@ -21,15 +22,16 @@ class Application {
     public View $clsView;
     protected array $aEventListeners;
 
-    public function __construct($sRootPath, array $aConfig) {
+    public function __construct(array $aConfig) {
         $this->sUserClass = $aConfig['sUserClass'];
-        self::$ROOT_DIR = $sRootPath;
+        self::$ROOT_DIR = $aConfig['sRootPath'];
+        self::$COMMON_URL = $aConfig['sCommonUrl'];
         self::$clsApp = $this;
         $this->clsSession = new Session();
         $this->clsRequest = new Request();
         $this->clsResponse = new Response();
         $this->clsRouter = new Router($this->clsRequest, $this->clsResponse);
-        $this->clsDb = new Database($aConfig['db']);
+        $this->clsDb = new ApplicationModel($aConfig['db']);
         $this->clsView = new View();
 
         $clsUser = new $this->sUserClass;

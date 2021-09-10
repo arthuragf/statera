@@ -37,7 +37,6 @@ class Router {
             /**
              * @var statera\core\Controller $clsController
              */
-            $fnCallback[0] = 'statera\\controllers\\' . $fnCallback[0];
             $clsController = new $fnCallback[0]();
             Application::$clsApp->clsController = $clsController;
             $clsController->sAction = $fnCallback[1];
@@ -47,7 +46,6 @@ class Router {
         foreach ($clsController->getMiddlewears() as $middleware) {
             $middleware->execute();
         }
-
         return call_user_func($fnCallback, $this->clsRequest, $this->clsResponse);
     }
 }

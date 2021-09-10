@@ -25,18 +25,4 @@ class SiteController extends Controller{
         ];
         return $this->render('home', $aParams);
     }
-
-    public function login(Request $clsRequest, Response $clsResponse) {
-        $clsLoginForm = new LoginForm();
-        if ($clsRequest->isPost()) {
-            $clsLoginForm->loadData($clsRequest->getBody());
-            if ($clsLoginForm->validate() && $clsLoginForm->login()) {
-                $clsResponse->redirect('/');
-                return;
-            }
-        }
-
-        $this->setLayout('auth');
-        return $this->render('login', ['clsModel' => $clsLoginForm]);
-    }
 }

@@ -24,7 +24,9 @@ class InputField extends BaseField{
             '<input type="%s" name="%s" value="%s" class="form-control %s">'
             , $this->sType
             , $this->sAttribute
-            , $this->clsModel->{$this->sAttribute}
+            , ($this->sType != self::TYPE_PASSWORD) 
+                ? $this->clsModel->{$this->sAttribute} 
+                : ''
             , $this->clsModel->hasError($this->sAttribute) ? ' is-invalid' : ''
         );
     }

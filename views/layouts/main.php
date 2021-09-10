@@ -16,7 +16,7 @@ use statera\core\Application;
   <body>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Navbar</a>
+                <a class="navbar-brand" href="/">Statera</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -29,29 +29,27 @@ use statera\core\Application;
                             <a class="nav-link" href="/contact">Contact</a>
                         </li>
                     </ul>
-                    <?php if (Application::isGuest()): ?>
-                        <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
-                            <li class="nav-item">
-                                <a class="nav-link" href="/login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/register">Register</a>
-                            </li>
+                    <?php if (!Application::$clsApp->isGuest()): ?>
+                    <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            My Account
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="edit_user">Edit User</a></li>
+                            <li><a class="dropdown-item" href="accounts">Add Account</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="settings">Settings</a></li>
                         </ul>
-                    <?php else: ?>
-                        <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
-                            <li class="nav-item">
-                                <a class="nav-link" href="/profile">Profile</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/logout">
-                                    Welcome <?= Application::$clsApp->oUser->getDisplayName(); ?>
-                                    (Logout)
-                                </a>
-                            </li>
-                        </ul>
+                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">
+                                Welcome <?= Application::$clsApp->oUser->getDisplayName(); ?>
+                                (Logout)
+                            </a>
+                        </li>
+                    </ul>
                     <?php endif; ?>
-
                 </div>
             </div>
         </nav>

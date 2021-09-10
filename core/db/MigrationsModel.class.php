@@ -2,14 +2,18 @@
 namespace statera\core\db;
 use statera\core\Application;
 
-class Database {
+class MigrationsModel {
+
     public \PDO $oPdo;
+    private $sRootDir;
+
     public function __construct(array $aConfig) {
-        $sDsn = $aConfig['sDsn'] ?? '';
-        $sUser = $aConfig['sUser'] ?? '';
-        $sPassword = $aConfig['sPassword'] ?? '';
+        $sDsn = $aConfig['db']['sDsn'] ?? '';
+        $sUser = $aConfig['db']['sUser'] ?? '';
+        $sPassword = $aConfig['db']['sPassword'] ?? '';
         $this->oPdo = new \PDO($sDsn, $sUser, $sPassword);
         $this->oPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->sRootDir = $aConfig['sRootDir'];
     }
 
     private function createMigrationsTable() {
@@ -22,7 +26,7 @@ class Database {
 
     public function applyMigrations() {
         $this->createMigrationsTable();
-        $aFiles = scandir(Application::$ROOT_DIR . '/migrations');
+        $aFiles = scandir($this->sRootDir . '/migrations/migration_files');
         $aAppliedMigrations = $this->getAppliedMigrations();
         $aToApplyMigrations = array_diff($aFiles, $aAppliedMigrations);
         $aNewMigrations = [];
@@ -32,7 +36,7 @@ class Database {
                 continue;
             }
 
-            require_once Application::$ROOT_DIR . '/migrations/' . $sMigration;
+            require_once $this->sRootDir . '/migrations/migration_files/' . $sMigration;
             $sClsName = pathinfo($sMigration, PATHINFO_FILENAME);
             
             $oInstance = new $sClsName($this);
@@ -67,11 +71,7 @@ class Database {
         $oSql->execute();
     }
 
-    public function prepare($sSql) {
-        return $this->oPdo->prepare($sSql);
-    }
-
-    protected function log($sMessage) {
+    private function log($sMessage) {
         echo '[' . date('Y-m-d H:i:s') . '] - ' . $sMessage . PHP_EOL;
     }
 }

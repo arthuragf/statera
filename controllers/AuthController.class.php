@@ -1,17 +1,16 @@
 <?php
-namespace app\controllers;
-use app\core\Application;
-use app\core\Controller;
-use app\core\Request;
-use app\core\Response;
-use app\models\User;
-use app\models\LoginForm;
-use app\core\middlewears\AuthMiddlewear;
+namespace statera\controllers;
+use statera\core\Application;
+use statera\core\Controller;
+use statera\core\Request;
+use statera\core\Response;
+use statera\models\User;
+use statera\models\LoginForm;
+use statera\core\middlewears\AuthMiddlewear;
 
 class AuthController extends Controller{
 
     public function __construct() {
-
         $this->registerMiddlewear(new AuthMiddlewear(['profile']));
     }
 
@@ -31,21 +30,45 @@ class AuthController extends Controller{
 
     public function register(Request $clsRequest) {
         $clsUser = new User();
+        $this->setLayout('auth');
         if ($clsRequest->isPost()) {
             $clsUser->loadData($clsRequest->getBody());
             
-            if ($clsUser->validate() && $clsUser->save()) {
-                Application::$clsApp->clsSession->setFlash('success', 'Thanks for registering');
+            if ($clsUser->validate() && $clsUser->insert()) {
+                Application::$clsApp->clsSession->setFlash('success', 'Account succesfully created');
                 Application::$clsApp->clsResponse->redirect('/');
+                exit;
             }
-
             return $this->render('register', [
                 'clsUser' => $clsUser
             ]);
             
         }
-        $this->setLayout('auth');
         return $this->render('register', [
+            'clsUser' => $clsUser
+        ]);
+    }
+
+    public function editUser(Request $clsRequest) {
+        $clsUser = new Application::$clsApp->sUserClass;
+        $sPrimaryKey = $clsUser->primaryKey();
+        $nPrimaryValue = Application::$clsApp->clsSession->get('user');
+        Application::$clsApp->oUser = $clsUser->findOne([$sPrimaryKey => $nPrimaryValue]);
+
+        if ($clsRequest->isPost()) {
+            $clsUser->loadData($clsRequest->getBody());
+            
+            if ($clsUser->validate() && $clsUser->edit()) {
+                Application::$clsApp->clsSession->setFlash('success', 'Account succesfully created');
+                Application::$clsApp->clsResponse->redirect('/');
+                exit;
+            }
+            return $this->render('edit_user', [
+                'clsUser' => $clsUser
+            ]);
+            
+        }
+        return $this->render('edit_user', [
             'clsUser' => $clsUser
         ]);
     }

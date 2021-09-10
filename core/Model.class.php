@@ -78,6 +78,8 @@ abstract class Model {
                 }
             }
         }
+        //debugAf
+        return true;
         return empty($this->aErrors);
     }
 
