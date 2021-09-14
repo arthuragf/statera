@@ -18,11 +18,15 @@ abstract class DbModel extends Model {
             . implode(', ', $aAttributes) 
             . ') VALUES (' 
             . implode(', ', $aParams) . ')');
+
+
         
         foreach ($aAttributes as $sAttribute)
-            $oSql->bindValue(':' . $sAttribute, $this->{$sAttribute});            
+            $oSql->bindValue(':' . $sAttribute, $this->{$sAttribute});    
+                    
         
         $oSql->execute();
+        
         return true;
     }
 
@@ -51,7 +55,6 @@ abstract class DbModel extends Model {
 
     public function findOne($aWhere) {
         $sTableName = $this->getTableName();
-        $aAttributes = array_keys($aWhere);
         $sWhere = implode(' AND ', array_map(fn($v) => $v . ' = :' . $v, array_keys($aWhere)));
         $oSql = $this->prepare('SELECT * FROM ' . $sTableName  
             . ' WHERE ' . $sWhere);

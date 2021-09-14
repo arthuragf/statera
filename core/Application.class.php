@@ -1,6 +1,7 @@
 <?php
 namespace statera\core;
 
+use statera\controllers\MailController;
 use statera\core\db\ApplicationModel;
 
 class Application {
@@ -8,6 +9,8 @@ class Application {
     const EVENT_AFTER_REQUEST = 'afterRequest';
 
     public static string $ROOT_DIR;
+    public static string $PUBLIC_DIR;
+    public static string $ASSETS_DIR;
     public static string $COMMON_URL;
     public static Application $clsApp;
     public string $sUserClass;
@@ -20,19 +23,29 @@ class Application {
     public Session $clsSession;
     public ?UserModel $oUser;
     public View $clsView;
+    public MailController $clsMail;
     protected array $aEventListeners;
 
     public function __construct(array $aConfig) {
         $this->sUserClass = $aConfig['sUserClass'];
         self::$ROOT_DIR = $aConfig['sRootPath'];
-        self::$COMMON_URL = $aConfig['sCommonUrl'];
+        self::$PUBLIC_DIR = self::$ROOT_DIR . $aConfig['sPublicPath'];
+        self::$ASSETS_DIR = $aConfig['sAssetsPath'];
         self::$clsApp = $this;
+        $this->clsMail = new MailController($aConfig['aMailParams']);
         $this->clsSession = new Session();
         $this->clsRequest = new Request();
         $this->clsResponse = new Response();
         $this->clsRouter = new Router($this->clsRequest, $this->clsResponse);
         $this->clsDb = new ApplicationModel($aConfig['db']);
         $this->clsView = new View();
+
+        $sProtocol = 'http://';
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+            $sProtocol = "https://";
+        }
+
+        self::$COMMON_URL = $sProtocol . $aConfig['sCommonUrl'];
 
         $clsUser = new $this->sUserClass;
         $sPrimaryKey = $clsUser->primaryKey();

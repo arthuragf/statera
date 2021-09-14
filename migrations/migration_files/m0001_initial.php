@@ -21,11 +21,25 @@ class m0001_initial {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) ENGINE=INNODB;
         ');
+
+        $this->clsDb->oPdo->exec('
+            CREATE TABLE IF NOT EXISTS password_recover (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                users_id INT NOT NULL,
+                token VARCHAR(8) NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (users_id) REFERENCES users(id)
+            ) ENGINE=INNODB;
+        ');
     }
 
     public function down() {
         $this->clsDb->oPdo->exec('
             DROP TABLE users;
+        ');
+
+        $this->clsDb->oPdo->exec('
+            DROP TABLE password_recover;
         ');
     }
 }

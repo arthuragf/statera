@@ -18,7 +18,7 @@ class LoginForm extends Model {
 
     public function login() {
         $clsUser = new User();
-        $oUser = $clsUser->findOne(['email' => $this->email]);
+        $oUser = $clsUser->findOne(['email' => $this->email, 'status' => $clsUser::STATUS_ACTIVE]);
 
         if (!$oUser) {
             $this->addError('email', 'User does not exist with this email');

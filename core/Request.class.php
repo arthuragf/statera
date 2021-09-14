@@ -9,7 +9,7 @@ class Request {
             return $sPath;
         }
 
-        return substr($sPath, 0, $nPosition);
+        return substr($sPath, 0, $nPosition - 1);
     }
 
     public function getMethod() {
@@ -26,7 +26,6 @@ class Request {
 
     public function getBody() {
         $aBody = [];
-        
         if ($this->getMethod() === 'get') {
             foreach ($_GET as $key => $value) {
                 $aBody[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);

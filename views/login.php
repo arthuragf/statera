@@ -12,12 +12,21 @@ use statera\core\Application;
 <?php $oForm = \statera\core\form\Form::begin('/login', 'post'); ?>
     <?= $oForm->InputField($clsModel, 'email'); ?>
     <?= $oForm->InputField($clsModel, 'password')->passwordField(); ?>
-    <button type="submit" class="btn btn-primary">Submit</button>
-    <button type="button" class="btn btn-primary" 
-        onclick="window.location='<?= 
-            "http://" . Application::$COMMON_URL . DIRECTORY_SEPARATOR . "register"; 
-        ?>'"
-    >
-            Create an Account
-    </button>
+    <div class="row">
+        <div class="col">
+        <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-primary" 
+                onclick="window.location='<?= 
+                    Application::$COMMON_URL . DIRECTORY_SEPARATOR . "register"; 
+                ?>'"
+            >
+                    Create an Account
+            </button>
+        </div>
+        <div class="col text-end">
+            <a href="<?= Application::$COMMON_URL . DIRECTORY_SEPARATOR . "pass_recovery";?>">
+                Forgot your password?
+            </a>    
+        </div>
+    </div>
 <?= \statera\core\form\Form::end(); ?>

@@ -15,6 +15,7 @@ class User extends UserModel{
     public string $password = '';
     public string $confirmPassword = '';
     public int $status = self::STATUS_ACTIVE;
+    public string $changePassword = '';
 
     public function getTableName(): string {
         return 'users';
@@ -30,14 +31,14 @@ class User extends UserModel{
 
     public function insert() {
         $this->status = self::STATUS_ACTIVE;
-        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+        $this->setPasswordHash();
         return parent::insert();
     }
 
     public function edit() {
-        $this->status = self::STATUS_ACTIVE;
-        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
-        $this->id = Application::$clsApp->clsSession->get('user');
+        $this->id = !empty($this->id) 
+            ? $this->id
+            : Application::$clsApp->clsSession->get('user');
         return parent::edit();
     }
 
@@ -58,6 +59,45 @@ class User extends UserModel{
             , 'confirmPassword' =>[self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']]
         ];
     }
+
+    public function editRules(): array {
+        return array_merge($this->rules(), [
+            'password' => [
+                [
+                    self::RULE_REQUIRED
+                    , 'require_activation' => true
+                    , 'field' => 'changePassword'
+                    , 'value' => 'on'
+                ], [
+                    self::RULE_MIN
+                    , 'min' => 8
+                    , 'require_activation' => true
+                    , 'field' => 'changePassword'
+                    , 'value' => 'on'
+                ], [
+                    self::RULE_MAX, 'max' => 24
+                    , 'require_activation' => true
+                    , 'field' => 'changePassword'
+                    , 'value' => 'on'
+                ]
+            ]
+            , 'confirmPassword' =>[
+                [
+                    self::RULE_REQUIRED
+                    , 'require_activation' => true
+                    , 'field' => 'changePassword'
+                    , 'value' => 'on' 
+                ], [
+                    self::RULE_MATCH
+                    , 'match' => 'password'
+                    , 'require_activation' => true
+                    , 'field' => 'changePassword'
+                    , 'value' => 'on'
+                ]
+            ]
+        ]);
+    }
+
     public function labels(): array {
         return [
             'firstname' => 'First name'
@@ -66,6 +106,20 @@ class User extends UserModel{
             , 'password' => 'Password'
             , 'confirmPassword' => 'Confirm password'
         ];
+    }
+
+    public function selectOptions():array {
+        return [
+            'status' => [
+                '-1' => 'Select a status'
+                , self::STATUS_ACTIVE => 'Active'
+                , self::STATUS_INACTIVE => 'Inactive'
+            ]
+        ];
+    }
+
+    public function setPasswordHash() {
+        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
     }
 
     public function getDisplayName(): string {

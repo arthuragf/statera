@@ -12,11 +12,15 @@ class Form {
         echo '</form>';
     }
 
-    public function InputField(Model $clsModel, $sAttribute) {
-        return new InputField ($clsModel, $sAttribute);
+    public function InputField(Model $clsModel, $sAttribute, array $aParams = []) {
+        return new InputField ($clsModel, $sAttribute, $aParams);
     }
 
-    public function TextareaField(Model $clsModel, $sAttribute) {
-        return new TextareaField ($clsModel, $sAttribute);
+    public function TextareaField(Model $clsModel, $sAttribute, array $aParams = []) {
+        return new TextareaField ($clsModel, $sAttribute, $aParams);
+    }
+
+    public function SelectField(Model $clsModel, $sAttribute, array $aParams = []) {
+        return new SelectField($clsModel, $sAttribute, $aParams);
     }
 }

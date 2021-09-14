@@ -9,13 +9,26 @@ require_once $sRootPath . DIRECTORY_SEPARATOR . 'autoload.php';
 (new DotEnv($sRootPath))->load();
 
 $aConfig = [
-    'sUserClass' => \statera\models\User::class,
-    'sRootPath' => $sRootPath,
-    'sCommonUrl' => $_ENV['COMMON_URL'],
-    'db' => [
-        'sDsn' => $_ENV['DB_DSN']
-        , 'sUser' => $_ENV['DB_USER']
-        , 'sPassword' => $_ENV['DB_PASSWORD']
+    'sUserClass' => \statera\models\User::class
+    , 'sRootPath' => $sRootPath
+    , 'sPublicPath' => '/public'
+    , 'sAssetsPath' => '/assets'
+    , 'sCommonUrl' => getenv('COMMON_URL')
+    , 'db' => [
+        'sDsn' => getenv('DB_DSN')
+        , 'sUser' => getenv('DB_USER')
+        , 'sPassword' => getenv('DB_PASSWORD')
+    ]
+    , 'aMailParams' => [
+        'bIsSmtp' => getenv('HOST_ISSMTP')
+        , 'nRequireAuth' => getenv('HOST_AUTH')
+        , 'sUserName' => getenv('HOST_USER')
+        , 'sMailPass' => getenv('HOST_PASS')
+        , 'sSmtpSecure' => getenv('HOST_SMPT_SECURE')
+        , 'sHostSmtp' => getenv('HOST_ADDRESS')
+        , 'nPortSmtp' => getenv('HOST_PORT')
+        , 'nIsHtml' => getenv('HOST_ISHTML')
+        , 'sFromName' => getenv('HOST_FROMNAME')
     ]
 ];
 $clsApp = new Application($aConfig);
@@ -31,20 +44,21 @@ if (!empty($_ENV['DEBUG_MODE'])) {
 
 $clsApp->clsRouter->get('/', [SiteController::class, 'home']);
 if(Application::isGuest()) {
-    //echo 123;
-    //die();
     $clsApp->clsRouter->get('/', [AuthController::class, 'login']);
 }
 $clsApp->clsRouter->get('/home', [SiteController::class, 'home']);
 $clsApp->clsRouter->get('/login', [AuthController::class, 'login']);
 $clsApp->clsRouter->post('/login', [AuthController::class, 'login']);
-//$clsApp->clsRouter->get('/contact', [SiteController::class, 'contact']);
-//$clsApp->clsRouter->post('/contact', [SiteController::class, 'contact']);
 $clsApp->clsRouter->get('/register', [AuthController::class, 'register']);
 $clsApp->clsRouter->post('/register', [AuthController::class, 'register']);
 $clsApp->clsRouter->get('/logout', [AuthController::class, 'logout']);
 $clsApp->clsRouter->get('/profile', [AuthController::class, 'profile']);
 $clsApp->clsRouter->get('/edit_user', [AuthController::class, 'editUser']);
 $clsApp->clsRouter->post('/edit_user', [AuthController::class, 'editUser']);
+$clsApp->clsRouter->get('/pass_recovery', [AuthController::class, 'passRecover']);
+$clsApp->clsRouter->post('/pass_recovery', [AuthController::class, 'passRecover']);
+$clsApp->clsRouter->get('/change_password', [AuthController::class, 'changePassword']);
+$clsApp->clsRouter->post('/change_password', [AuthController::class, 'changePassword']);
+$clsApp->clsRouter->get('/teste', [AuthController::class, 'teste']);
 
 $clsApp->run();

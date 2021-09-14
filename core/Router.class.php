@@ -24,7 +24,6 @@ class Router {
         $sPath = $this->clsRequest->getPath();
         $sMethod = $this->clsRequest->getMethod();
         $fnCallback = $this->aRoutes[$sMethod][$sPath] ?? false;
-
         if ($fnCallback === false) {
             throw new NotFoundException();
         }
@@ -46,6 +45,7 @@ class Router {
         foreach ($clsController->getMiddlewears() as $middleware) {
             $middleware->execute();
         }
+
         return call_user_func($fnCallback, $this->clsRequest, $this->clsResponse);
     }
 }

@@ -9,7 +9,10 @@ abstract class Model {
     public const RULE_MAX = 'max';
     public const RULE_MATCH = 'match';
     public const RULE_UNIQUE = 'unique';
+    public const POST_ACTION_INSERT = 'insert';
+    public const POST_ACTION_EDIT = 'edit';
     public array $aErrors = [];
+    public string $sPostAction = self::POST_ACTION_INSERT;
 
     public function loadData($aData) {
         foreach ($aData as $key => $value) {
@@ -20,6 +23,10 @@ abstract class Model {
     }
 
     abstract public function rules(): array;
+    
+    public function editRules():array {
+        return array_merge($this->rules(), []);
+    }
 
     public function labels():array {
         return [];
@@ -29,36 +36,71 @@ abstract class Model {
         return $this->labels()[$sAttribute] ?? $sAttribute;
     }
 
+    public function selectOptions():array {
+        return [];
+    }
+
+    public function getSelectOptions($sAttribute):array {
+        return $this->selectOptions()[$sAttribute] ?? [];
+    }
+
     public function validate() {
-        foreach ($this->rules() as $sAttribute => $aRules) {
+        if ($this->sPostAction === self::POST_ACTION_INSERT)
+            $aPostRules = $this->rules();
+        else
+            $aPostRules = $this->editRules();
+
+        foreach ($aPostRules as $sAttribute => $aRules) {
             $sValue = $this->{$sAttribute};
             foreach ($aRules as $rule) {
                 $sRuleName = $rule;
-                
+                $bAddError = true;
+
                 if (!is_string($sRuleName)) {
                     $sRuleName = $rule[0];
                 }
             
                 if ($sRuleName === self::RULE_REQUIRED && empty($sValue)) {
-                    $this->addErrorForRule($sAttribute, self::RULE_REQUIRED);
+                    if (!empty($rule['require_activation']) && $this->{$rule['field']} !== $rule['value']) {
+                        $bAddError = false;
+                    }
+                    if($bAddError)
+                        $this->addErrorForRule($sAttribute, self::RULE_REQUIRED);
                 }
 
                 if ($sRuleName === self::RULE_EMAIL && !filter_var($sValue, FILTER_VALIDATE_EMAIL)) {
-                    $this->addErrorForRule($sAttribute, self::RULE_EMAIL);
+                    if (!empty($rule['require_activation']) && $this->{$rule['field']} != $rule['value']) {
+                        $bAddError = false;
+                    }
+                    if($bAddError)
+                        $this->addErrorForRule($sAttribute, self::RULE_EMAIL);
                 }
 
                 if ($sRuleName === self::RULE_MIN && strlen($sValue) < $rule['min']) {
-                    $this->addErrorForRule($sAttribute, self::RULE_MIN, $rule);
+                    if (!empty($rule['require_activation']) && $this->{$rule['field']} != $rule['value']) {
+                        $bAddError = false;
+                    }
+                    if($bAddError)
+                        $this->addErrorForRule($sAttribute, self::RULE_MIN, $rule);
                 }
 
                 if ($sRuleName === self::RULE_MAX && strlen($sValue) > $rule['max']) {
-                    $this->addErrorForRule($sAttribute, self::RULE_MAX, $rule);
+                    if (!empty($rule['require_activation']) && $this->{$rule['field']} != $rule['value']) {
+                        $bAddError = false;
+                    }
+                    if($bAddError)
+                        $this->addErrorForRule($sAttribute, self::RULE_MAX, $rule);
                 }
 
                 if ($sRuleName === self::RULE_MATCH && $sValue !== $this->{$rule['match']}) {
                     $rule['match'] = $this->getLabel($rule['match']);
-                    $this->addErrorForRule($sAttribute, self::RULE_MATCH, $rule);
+                    if (!empty($rule['require_activation']) && $this->{$rule['field']} != $rule['value']) {
+                        $bAddError = false;
+                    }
+                    if($bAddError)
+                        $this->addErrorForRule($sAttribute, self::RULE_MATCH, $rule);
                 }
+
                 if ($sRuleName === self::RULE_UNIQUE) {
                     $oClass = $rule['oClass'];
                     $sUniqueAttribute = $rule['sAttribute'] ?? $sAttribute;
@@ -67,8 +109,10 @@ abstract class Model {
                         . $sTableName 
                         . ' WHERE '
                         . $sUniqueAttribute . ' = :attr' 
+                        . ' AND ' . $oClass->primaryKey() . ' != :id '
                     );
                     $oSql->bindValue(':attr', $sValue);
+                    $oSql->bindValue(':id', Application::$clsApp->clsSession->get('user'));
                     $oSql->execute();
                     $oRecord = $oSql->fetchObject();
                     
@@ -78,8 +122,6 @@ abstract class Model {
                 }
             }
         }
-        //debugAf
-        return true;
         return empty($this->aErrors);
     }
 

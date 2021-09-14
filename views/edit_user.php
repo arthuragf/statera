@@ -2,9 +2,16 @@
     /** @var Application::$clsApp->oUser statera\models\User */
 
 use statera\core\Application;
+use statera\models\Custom;
 
 /** @var $this statera\core\View */
     $this->sTitle = 'Edit User';
+    $this->aRequiredAssets = ['js' => ['edit_user']];
+
+    $clsCustom = new Custom(
+        ['changePassword' => 'on']
+        , ['changePassword' => 'Change password']
+    );
 ?>
 
 <h1>Create an account</h1>
@@ -17,8 +24,16 @@ use statera\core\Application;
             <?= $oForm->InputField(Application::$clsApp->oUser, 'lastname'); ?>
         </div>
     </div>
-    <?= $oForm->InputField(Application::$clsApp->oUser, 'email'); ?>
-    <?= $oForm->InputField(Application::$clsApp->oUser, 'password')->passwordField(); ?>
-    <?= $oForm->InputField(Application::$clsApp->oUser, 'confirmPassword')->passwordField(); ?>
+    <div class="row">
+        <div class="col">
+            <?= $oForm->InputField(Application::$clsApp->oUser, 'email'); ?>
+        </div>
+        <div class="col">
+            <?= $oForm->SelectField(Application::$clsApp->oUser, 'status'); ?>        
+        </div>
+    </div>
+    <?= $oForm->InputField($clsCustom, 'changePassword', ['aAttributes' => ['onclick="enablePasswordFields([\'password\',\'confirmPassword\'])"'], 'aClasses' => ['classteste', 'classteste2']])->checkboxField(); ?>
+    <?= $oForm->InputField(Application::$clsApp->oUser, 'password', ['aAttributes' => ['disabled']])->passwordField(); ?>
+    <?= $oForm->InputField(Application::$clsApp->oUser, 'confirmPassword',['aAttributes' => ['disabled']])->passwordField(); ?>
     <button type="submit" class="btn btn-primary">Submit</button>
 <?= statera\core\form\Form::end(); ?>
