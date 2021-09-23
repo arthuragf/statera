@@ -1,6 +1,9 @@
 <?php
 namespace statera\core;
 class Request {
+
+    public $aBase64Fields = [];
+
     public function getPath() {
         $sPath = $_SERVER['REQUEST_URI'] ?? '/';
         $nPosition = strpos($sPath, '?');
@@ -29,6 +32,9 @@ class Request {
         if ($this->getMethod() === 'get') {
             foreach ($_GET as $key => $value) {
                 $aBody[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+                if (in_array($key, $this->aBase64Fields)) {
+                    $aBody[$key] = base64_decode($aBody[$key]);
+                }
             }
         }
 

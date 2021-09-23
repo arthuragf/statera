@@ -59,6 +59,7 @@ $clsApp->clsRouter->get('/pass_recovery', [AuthController::class, 'passRecover']
 $clsApp->clsRouter->post('/pass_recovery', [AuthController::class, 'passRecover']);
 $clsApp->clsRouter->get('/change_password', [AuthController::class, 'changePassword']);
 $clsApp->clsRouter->post('/change_password', [AuthController::class, 'changePassword']);
+$clsApp->clsRouter->get('/activate_account', [AuthController::class, 'activateAccount']);
 $clsApp->clsRouter->get('/teste', [AuthController::class, 'teste']);
 
 $clsApp->run();

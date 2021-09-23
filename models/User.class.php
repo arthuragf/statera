@@ -30,9 +30,11 @@ class User extends UserModel{
     }
 
     public function insert() {
-        $this->status = self::STATUS_ACTIVE;
+        $this->status = self::STATUS_INACTIVE;
         $this->setPasswordHash();
-        return parent::insert();
+        if (parent::insert())
+            $this->id = Application::$clsApp->clsDb->oPdo->lastInsertId();
+        return true;
     }
 
     public function edit() {

@@ -26,21 +26,6 @@ class PassRecover extends DbModel{
         return ['token', 'users_id'];
     }
 
-    public function sendRecoverMail() {
-        if ($this->insert()) {
-            return Application::$clsApp->clsMail->sendMail(
-                [
-                    'aRecipient' => [
-                        'sRecipientEmail' => 'arthur.agf@gmail.com'
-                        , 'sRecipientName' => 'ARTHUR_FARIA'
-                    ]
-                    , 'sSubject' => 'Password change request'
-                    , 'sBody' => $this->getRecoverMailBody()
-                ]
-            );
-        }
-    }
-
     public function insert() {
         $clsUser = new Application::$clsApp->sUserClass;
         $this->oUser = $clsUser->findOne(['email' => $this->email]);
@@ -78,18 +63,6 @@ class PassRecover extends DbModel{
             , 'password' => 'New password'
             , 'confirmPassword' => 'Confirm new password'
         ];
-    }
-
-    private function getRecoverMailBody() {
-        $sUrl = Application::$COMMON_URL . '/change_password/?token=' . $this->token;
-        $sBody = 'Hi ' . $this->oUser->getDisplayName() . ', <br>';
-        $sBody .= 'To change your password, please, click on the link below.<br>';
-        $sBody .= sprintf('<a href="%s">Change my password</a>'
-            , $sUrl
-        );
-        $sBody .= ' or paste the address in your navigator <br>';
-        $sBody .= $sUrl;
-        return $sBody;
     }
 
     public function validateToken($sToken) {
