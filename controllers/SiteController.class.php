@@ -12,7 +12,7 @@ class SiteController extends Controller{
     public const GUEST_ALIAS = 'Guest';
 
     public function __construct(){
-        $this->registerMiddlewear(new AuthMiddlewear(['home']));
+        $this->registerMiddlewear(new AuthMiddlewear(['home', 'edit_user']));
     }
 
     public function home(Request $clsRequest, Response $clsResponse) {

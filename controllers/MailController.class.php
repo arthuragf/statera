@@ -27,9 +27,10 @@ class MailController {
     }
 
     public function sendMail(array $aParams): bool {
+        
             $this->clsPHPMailer->addAddress(
                 $aParams['aRecipient']['sRecipientEmail']
-                , $aParams['aRecipient']['sRecipientName']
+                , $aParams['aRecipient']['sRecipientName'] ?? ''
             );
             $this->clsPHPMailer->Subject = $aParams['sSubject'];
             $this->clsPHPMailer->Body    = $aParams['sBody'];

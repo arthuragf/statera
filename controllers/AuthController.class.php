@@ -2,6 +2,7 @@
 namespace statera\controllers;
 use statera\core\Application;
 use statera\core\Controller;
+use statera\core\exceptions\InvalidTokenException;
 use statera\core\Request;
 use statera\core\Response;
 use statera\models\User;
@@ -12,7 +13,7 @@ use statera\core\middlewears\AuthMiddlewear;
 class AuthController extends Controller{
 
     public function __construct() {
-        $this->registerMiddlewear(new AuthMiddlewear(['profile']));
+        $this->registerMiddlewear(new AuthMiddlewear(['editUser']));
     }
 
     public function login(Request $clsRequest, Response $clsResponse) {
@@ -122,7 +123,7 @@ class AuthController extends Controller{
         return Application::$clsApp->clsMail->sendMail(
             [
                 'aRecipient' => [
-                    'sRecipientEmail' => $clsRecoverMail
+                    'sRecipientEmail' => $clsRecoverMail->oUser->email
                 ]
                 , 'sSubject' => 'Password change request'
                 , 'sBody' => $this->getRecoverMailBody($clsRecoverMail)
@@ -144,8 +145,12 @@ class AuthController extends Controller{
 
     public function changePassword(Request $clsRequest, Response $clsResponse) {
         $clsRecoverPass = new PassRecover;
-        $clsRecoverPass->loadData($clsRequest->getBody());
+        $aBody = $clsRequest->getBody();
         $this->setLayout('auth');
+        if (empty($aBody['token'])) {
+            throw new InvalidTokenException();
+        }
+        $clsRecoverPass->loadData($aBody);
         if ($clsRequest->isPost()) {
             $clsRecoverPass->sPostAction = $clsRecoverPass::POST_ACTION_EDIT;
             $clsRecoverPass->validateToken($clsRequest->getBody()['token']);
@@ -156,7 +161,7 @@ class AuthController extends Controller{
         }
         return $this->render('change_password', [
             'clsRecoverPass' => $clsRecoverPass
-            , 'token' => $clsRequest->getBody()['token']
+            , 'token' => $aBody['token']
         ]);
     }
     

@@ -8,7 +8,7 @@ use statera\core\exceptions\ExpiredTokenException;
 class PassRecover extends DbModel{
     public string $token = '';
     public int $users_id = 0;
-    private User $oUser;
+    public User $oUser;
     public string $email = '';
     public string $password = '';
     public string $confirmPassword = '';
